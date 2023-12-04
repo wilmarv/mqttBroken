@@ -7,6 +7,7 @@ class ClientMQTT {
     private password: string = "Mosquittopass1";
 
     private client: null | any = null;
+    private subscribe: string = "";
 
     constructor(subscribe: string) {
         if (this.client === null) {
@@ -19,6 +20,7 @@ class ClientMQTT {
                         timeout: 500,
                         onSuccess: () => {
                             console.log(`subscribe ${subscribe}/ success`);
+                            this.subscribe = subscribe;
                         },
                         onFailure: (error: any) => {
                             console.log("subscribe: ", error)
@@ -38,6 +40,12 @@ class ClientMQTT {
 
     setMessageArrived(voidCallBack: (message: Message) => void) {
         this.client.onMessageArrived = voidCallBack;
+    }
+
+    sendMessage(msg: string) {
+        const message = new Paho.Message(msg);
+        message.destinationName = this.subscribe;
+        this.client.send(message);
     }
 
 }

@@ -1,12 +1,14 @@
 import { StyleSheet, View } from "react-native";
 import EstufaPage from "./estufa";
+import FechaduraPage from "./fechadura";
 
 function HomePage() {
 
     return (
         <View style={styles.view}>
             <View style={styles.body}>
-                <EstufaPage />
+                {/* <EstufaPage /> */}
+                <FechaduraPage />
             </View>
         </View>
     );
