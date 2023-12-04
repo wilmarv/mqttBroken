@@ -4,18 +4,40 @@ import { useEffect, useState } from "react";
 import { Grid, LineChart, YAxis } from 'react-native-svg-charts';
 import ClientMQTT from "~/service/ClientMQTT";
 
-const data = [-10, -8, -5, -3, -2, 0, 1, 2];
-
 function EstufaPage() {
 
     const [modeOperacao, setModoOperacao] = useState(-1);
+    const [arrayTemp, setArrayTemp] = useState<number[]>([]);
+    const [clientMQTT, setClientMQTT] = useState<null | ClientMQTT>(null);
+    const [atualtemp, setAtualtemp] = useState<number | null>(null);
 
     useEffect(() => {
-        const clientMQTT = new ClientMQTT("sistematemperatura");
-        
-
+        if (clientMQTT === null) {
+            const clientMQTT = new ClientMQTT("sistematemperatura/atual");
+            clientMQTT.setMessageArrived((message) => {
+                const atualtemp = Number(message.payloadString);
+                setAtualtemp(atualtemp);
+            });
+            setClientMQTT(clientMQTT);
+        }
     }, []);
 
+    useEffect(() => {
+        if (atualtemp !== null) {
+            if (arrayTemp.length > 12) {
+                const novaLista = arrayTemp.slice(1);
+                setArrayTemp([...novaLista, atualtemp]);
+                return;
+            }
+            setArrayTemp([...arrayTemp, atualtemp]);
+        }
+    }, [atualtemp]);
+
+    useEffect(() => {
+        if (modeOperacao === 0) clientMQTT?.sendMessage("-2", "sistematemperatura/configurada");
+        if (modeOperacao === 1) clientMQTT?.sendMessage(`-6`, "sistematemperatura/configurada");
+        if (modeOperacao === 2) clientMQTT?.sendMessage(`-8`, "sistematemperatura/configurada");
+    }, [modeOperacao]);
     return (
         <View style={styles.container}>
             <Text style={styles.title}>SISTEMA DE CONTROLE DE TEMPERATURA</Text>
@@ -31,7 +53,7 @@ function EstufaPage() {
 
             <View style={styles.graficoContainer}>
                 <YAxis
-                    data={data}
+                    data={arrayTemp}
                     svg={{
                         fill: 'grey',
                         fontSize: 10,
@@ -42,7 +64,7 @@ function EstufaPage() {
                 />
                 <LineChart
                     style={{ flex: 1, marginLeft: 16 }}
-                    data={data}
+                    data={arrayTemp}
                     svg={{ stroke: "#2855AE" }}
                     xMax={12}
                     yMax={11}

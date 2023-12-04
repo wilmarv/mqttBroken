@@ -7,8 +7,8 @@ function HomePage() {
     return (
         <View style={styles.view}>
             <View style={styles.body}>
-                {/* <EstufaPage /> */}
-                <FechaduraPage />
+                <EstufaPage />
+                {/* <FechaduraPage /> */}
             </View>
         </View>
     );

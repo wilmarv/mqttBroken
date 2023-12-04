@@ -42,9 +42,9 @@ class ClientMQTT {
         this.client.onMessageArrived = voidCallBack;
     }
 
-    sendMessage(msg: string) {
+    sendMessage(msg: string, destino?: string) {
         const message = new Paho.Message(msg);
-        message.destinationName = this.subscribe;
+        message.destinationName = destino || this.subscribe;
         this.client.send(message);
     }
 
